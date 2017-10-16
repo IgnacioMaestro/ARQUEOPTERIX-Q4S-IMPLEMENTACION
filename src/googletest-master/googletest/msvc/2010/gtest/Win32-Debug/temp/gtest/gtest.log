@@ -1,0 +1,18 @@
+﻿Build started 09/10/2017 13:19:11.
+     1>Project "D:\Work\ARQUEOPTERIX\src\googletest-master\googletest-master\googletest\msvc\2010\gtest.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "D:\Work\ARQUEOPTERIX\src\googletest-master\googletest-master\googletest\msvc\2010\gtest\Win32-Debug\temp\gtest\gtest.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.. /I..\include /I..\..\include /I..\.. /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _VARIADIC_MAX=10 /D _DEBUG /D _LIB /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"D:\Work\ARQUEOPTERIX\src\googletest-master\googletest-master\googletest\msvc\2010\gtest\Win32-Debug\temp\gtest\\" /Fd"D:\Work\ARQUEOPTERIX\src\googletest-master\googletest-master\googletest\msvc\2010\gtest\Win32-Debug\temp\gtest\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt "..\..\src\gtest-all.cc"
+         gtest-all.cc
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"D:\Work\ARQUEOPTERIX\src\googletest-master\googletest-master\googletest\msvc\2010\gtest\Win32-Debug\gtestd.lib" /NOLOGO "D:\Work\ARQUEOPTERIX\src\googletest-master\googletest-master\googletest\msvc\2010\gtest\Win32-Debug\temp\gtest\gtest-all.obj"
+         gtest.vcxproj -> D:\Work\ARQUEOPTERIX\src\googletest-master\googletest-master\googletest\msvc\2010\gtest\Win32-Debug\gtestd.lib
+       FinalizeBuildStatus:
+         Deleting file "D:\Work\ARQUEOPTERIX\src\googletest-master\googletest-master\googletest\msvc\2010\gtest\Win32-Debug\temp\gtest\gtest.unsuccessfulbuild".
+         Touching "D:\Work\ARQUEOPTERIX\src\googletest-master\googletest-master\googletest\msvc\2010\gtest\Win32-Debug\temp\gtest\gtest.lastbuildstate".
+     1>Done Building Project "D:\Work\ARQUEOPTERIX\src\googletest-master\googletest-master\googletest\msvc\2010\gtest.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:07.99
