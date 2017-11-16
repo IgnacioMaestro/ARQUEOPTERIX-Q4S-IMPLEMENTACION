@@ -119,6 +119,8 @@ void Q4SServerProtocol::closeConnections()
 
 bool Q4SServerProtocol::begin()
 {
+    printf("Handshake Phase\n");
+
     printf("WAITING FOR BEGIN\n");
     std::string message;
 

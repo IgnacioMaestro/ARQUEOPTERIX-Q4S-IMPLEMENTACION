@@ -94,6 +94,8 @@ void Q4SClientProtocol::closeConnections()
 
 bool Q4SClientProtocol::begin()
 {
+    printf("Handshake Phase\n");
+
     printf("METHOD: begin\n");
 
     bool ok = true;
