@@ -3,6 +3,7 @@
 
 #include <string>
 #include "Q4SSDP.h"
+#include "Q4SStructs.h"
 
 enum Q4SMRequestOrResponse
 { Q4SMREQUESTORRESPOND_INVALID
@@ -20,50 +21,63 @@ enum Q4SMType
 , Q4SMTYPE_Q4SALERT
 };
 
-class Q4SMessage
-{
-    public:
-
-    // Constructor-Destructor
-    Q4SMessage( );
-    ~Q4SMessage( );
-
-    // Init-Done
-    bool    init(   Q4SMRequestOrResponse q4SMRequestOrResponse,
-                    Q4SMType q4SMType, 
-                    std::string host, 
-                    std::string port);
-    bool    init(   Q4SMRequestOrResponse q4SMRequestOrResponse,
-                    Q4SMType q4SMType, 
-                    std::string host, 
-                    std::string port,
-                    int sequenceNumber,
-                    unsigned long timeStamp);
-    bool    init(   Q4SMRequestOrResponse q4SMRequestOrResponse,
-                    Q4SMType q4SMType, 
-                    std::string host, 
-                    std::string port, 
-                    Q4SSDP q4SSDP);
-    void    done( );
-
-    // Get Message
-    std::string getMessage() const;
-    const char* getMessageCChar() const;
-
-private:
-
-    void    clear( );
-
-    void    makeFirstLine(Q4SMRequestOrResponse q4SMRequestOrResponse, Q4SMType q4SMType, std::string host, std::string port);
-    void    makeFirstLineRequest(Q4SMType q4SMType, std::string host, std::string port);
-    void    makeFirstLineRequestMethod(Q4SMType q4SMType);
-    void    makeFirstLineRequestURI(std::string host, std::string port);
-    void    makeFirstLineRequestVersion();
-    void    makeHeaders();
-    void    makeHeaders(int sequenceNumber, unsigned long timeStamp);
-    void    makeBody();
-
-    std::string mMessage;
+enum Q4SResponseCode
+{ Q4SRESPONSECODE_INVALID
+, Q4SRESPONSECODE_200
+, Q4SRESPONSECODE_3XX
+, Q4SRESPONSECODE_400
+, Q4SRESPONSECODE_404
+, Q4SRESPONSECODE_405
+, Q4SRESPONSECODE_406
+, Q4SRESPONSECODE_408
+, Q4SRESPONSECODE_413
+, Q4SRESPONSECODE_414
+, Q4SRESPONSECODE_415
+, Q4SRESPONSECODE_416
+, Q4SRESPONSECODE_500
+, Q4SRESPONSECODE_501
+, Q4SRESPONSECODE_503
+, Q4SRESPONSECODE_504
+, Q4SRESPONSECODE_505
+, Q4SRESPONSECODE_513
+, Q4SRESPONSECODE_600
+, Q4SRESPONSECODE_601
+, Q4SRESPONSECODE_603
+, Q4SRESPONSECODE_604
 };
 
+std::string Q4SMessage_createPing(std::string host, std::string port, unsigned long sequenceNumber, unsigned long timeStamp);
+std::string Q4SMessage_createPing(std::string host, std::string port, unsigned long sequenceNumber, unsigned long timeStamp, Q4SMeasurementValues &results);
+std::string Q4SMessage_createBWidth(std::string host, std::string port, unsigned long sequenceNumber);
+std::string Q4SMessage_createBegin(std::string host, std::string port);
+std::string Q4SMessage_createReady(std::string host, std::string port, unsigned long stage);
+std::string Q4SMessage_create200OKBeginResponse();
+std::string Q4SMessage_create200OKBeginResponse(unsigned long sequenceNumber);
+std::string Q4SMessage_create200OKBeginResponse(Q4SSDPParams q4SSDPParams);
+std::string Q4SMessage_createResponse(Q4SResponseCode q4SResponseCode, std::string reasonPhrase);
+std::string Q4SMessage_createRequest(Q4SMType q4SMType, 
+						std::string host, 
+						std::string port,
+						bool isSequenceNumber=false,
+						unsigned long sequenceNumber=0,
+						bool isTimeStamp=false,
+						unsigned long timeStamp=0,
+						bool isStage=false,
+						unsigned long stage=0,
+						bool isMeaurements=false,
+						Q4SMeasurementValues *values=NULL);
+std::string Q4SMessage_createRequest_withSDP(Q4SMType q4SMType, 
+						std::string host, 
+						std::string port,
+						bool isSequenceNumber,
+						unsigned long sequenceNumber,
+						bool isTimeStamp,
+						unsigned long timeStamp,
+						bool isStage,
+						unsigned long stage,
+						Q4SSDPParams q4SSDPParams);
+std::string Q4SMessage_createRequest_withSDP(Q4SMType q4SMType, 
+						std::string host, 
+						std::string port, 
+						Q4SSDPParams q4SSDPParams);
 #endif  // _Q4SMESSAGE_H_

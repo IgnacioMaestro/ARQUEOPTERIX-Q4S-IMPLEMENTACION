@@ -1,55 +1,18 @@
-#include "Q4SCommonProtocol.h"
+#include "Q4SCalculation.h"
 
 #include "Q4SMessageInfo.h"
 #include "Q4SMessageManager.h"
 #include "Q4SMathUtils.h"
 #include <sstream>
 
-void Q4SCommonProtocol::calculateLatency(Q4SMessageManager &mReceivedMessages, std::vector<unsigned long> &arrSentPingTimestamps, float &latency, unsigned long pingsSent, bool showMeasureInfo) const
-{
-    Q4SMessageInfo messageInfo;
-    std::vector<float> arrPingLatencies;
-    float actualPingLatency;
-    int pingIndex = 0;
-    int pingMaxCount = pingsSent;
-
-    // Prepare for Latency calculation
-    for( pingIndex = 0; pingIndex < pingMaxCount; pingIndex++ )
-    {
-        if( mReceivedMessages.read200OKMessage( messageInfo, true ) == true )
-        {
-            // Actual ping latency calculation
-            actualPingLatency = (messageInfo.timeStamp - arrSentPingTimestamps[ pingIndex ])/ 2.0f;
-
-            // Latency store
-            arrPingLatencies.push_back( actualPingLatency );
-
-            if (showMeasureInfo)
-            {
-                printf( "PING %d actual ping latency: %.3f\n", pingIndex, actualPingLatency );
-            }
-        }
-        else
-        {
-			if (showMeasureInfo)
-			{
-                printf( "PING RESPONSE %d message lost\n", pingIndex);
-			}
-        }
-    }
-
-    // Latency calculation
-    latency = EMathUtils_median( arrPingLatencies );
-}
-
-void Q4SCommonProtocol::calculateJitter(
+void Calculation_calculateJitter(
 	Q4SMessageManager &mReceivedMessages, 
 	float &jitter, 
 	unsigned long timeBetweenPings, 
 	unsigned long pingsSent, 
 	bool calculatePacketLoss, 
 	float &packetLoss, 
-	bool showMeasureInfo) const
+	bool showMeasureInfo)
 {
     int pingIndex = 0;
 	int pingMaxCount = pingsSent;
@@ -112,29 +75,29 @@ void Q4SCommonProtocol::calculateJitter(
         printf( "Time With previous ping mean: %.3f\n", jitter );
     }
 }
-void Q4SCommonProtocol::calculateJitterStage0(
+void Calculation_calculateJitterStage0(
 	Q4SMessageManager &mReceivedMessages, 
 	float &jitter, 
 	unsigned long timeBetweenPings, 
 	unsigned long pingsSent, 
-	bool showMeasureInfo) const
+	bool showMeasureInfo)
 {
 	float packetLoss = 0.f;
-	calculateJitter(mReceivedMessages, jitter, timeBetweenPings, pingsSent, false, packetLoss, showMeasureInfo);
+	Calculation_calculateJitter(mReceivedMessages, jitter, timeBetweenPings, pingsSent, false, packetLoss, showMeasureInfo);
 }
 
-void Q4SCommonProtocol::calculateJitterAndPacketLossContinuity(
+void Calculation_calculateJitterAndPacketLossContinuity(
 	Q4SMessageManager &mReceivedMessages, 
 	float &jitter, 
 	unsigned long timeBetweenPings, 
 	unsigned long pingsSent, 
 	float &packetLoss, 
-	bool showMeasureInfo) const
+	bool showMeasureInfo)
 {
-	calculateJitter(mReceivedMessages, jitter, timeBetweenPings, pingsSent, true, packetLoss, showMeasureInfo);
+	Calculation_calculateJitter(mReceivedMessages, jitter, timeBetweenPings, pingsSent, true, packetLoss, showMeasureInfo);
 }
 
-std::set<unsigned long> Q4SCommonProtocol::obtainSortedSequenceNumberList(Q4SMessageManager &mReceivedMessages) const
+std::set<unsigned long> Calculation_obtainSortedSequenceNumberList(Q4SMessageManager &mReceivedMessages)
 {
     std::set<unsigned long> recivedSequenceNumberList;
 
@@ -148,20 +111,20 @@ std::set<unsigned long> Q4SCommonProtocol::obtainSortedSequenceNumberList(Q4SMes
 	return recivedSequenceNumberList;
 }
 
-void Q4SCommonProtocol::calculateBandwidthStage1(unsigned long sequenceNumber, unsigned long bandwidthTime, float &bandwidth) const
+void Calculation_calculateBandwidthStage1(unsigned long sequenceNumber, unsigned long bandwidthTime, float &bandwidth)
 {
 	float numberOfPacketsPerSecond = (float)sequenceNumber * 1000.f / (float)bandwidthTime;
 	float kilobitsPerSecond = numberOfPacketsPerSecond * 8;
 	bandwidth = kilobitsPerSecond;
 }
 
-bool Q4SCommonProtocol::calculatePacketLossStage1(Q4SMessageManager &mReceivedMessages, float &packetLoss) const
+bool Calculation_calculatePacketLossStage1(Q4SMessageManager &mReceivedMessages, float &packetLoss)
 {
 	bool ok = false;
 
 	packetLoss = 0;
 
-	std::set<unsigned long> recivedSequenceNumberList = obtainSortedSequenceNumberList(mReceivedMessages);
+	std::set<unsigned long> recivedSequenceNumberList = Calculation_obtainSortedSequenceNumberList(mReceivedMessages);
 
 	if (!recivedSequenceNumberList.empty())
 	{
@@ -199,7 +162,7 @@ bool Q4SCommonProtocol::calculatePacketLossStage1(Q4SMessageManager &mReceivedMe
 	return ok;
 }
 
-bool Q4SCommonProtocol::checkStage0(unsigned long maxLatency, unsigned long maxJitter, Q4SMeasurementResult &results) const
+bool Calculation_checkStage0(unsigned long maxLatency, unsigned long maxJitter, Q4SMeasurementResult &results)
 {
     bool ok = true;
 
@@ -220,18 +183,18 @@ bool Q4SCommonProtocol::checkStage0(unsigned long maxLatency, unsigned long maxJ
     return ok;
 }
 
-bool Q4SCommonProtocol::checkStage0(unsigned long maxLatencyUp, unsigned long maxJitterUp, unsigned long maxLatencyDown, unsigned long maxJitterDown, Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults) const
+bool Calculation_checkStage0(unsigned long maxLatencyUp, unsigned long maxJitterUp, unsigned long maxLatencyDown, unsigned long maxJitterDown, Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults)
 {
 	bool ok = true;
 
-	ok &= checkStage0(maxLatencyUp, maxJitterUp, upResults);
+	ok &= Calculation_checkStage0(maxLatencyUp, maxJitterUp, upResults);
 
-	ok &= checkStage0(maxLatencyDown, maxJitterDown, downResults);
+	ok &= Calculation_checkStage0(maxLatencyDown, maxJitterDown, downResults);
 
 	return ok;
 }
 
-bool Q4SCommonProtocol::checkStage1(unsigned long bandwidth, float packetLoss, Q4SMeasurementResult &results) const
+bool Calculation_checkStage1(unsigned long bandwidth, float packetLoss, Q4SMeasurementResult &results)
 {
     bool ok = true;
 
@@ -252,18 +215,18 @@ bool Q4SCommonProtocol::checkStage1(unsigned long bandwidth, float packetLoss, Q
     return ok;
 }
 
-bool Q4SCommonProtocol::checkStage1(unsigned long bandwidthUp, float packetLossUp, unsigned long bandwidthDown, float packetLossDown, Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults) const
+bool Calculation_checkStage1(unsigned long bandwidthUp, float packetLossUp, unsigned long bandwidthDown, float packetLossDown, Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults)
 {
 	bool ok = true;
 
-	ok &= checkStage1(bandwidthUp, packetLossUp, upResults);
+	ok &= Calculation_checkStage1(bandwidthUp, packetLossUp, upResults);
 
-	ok &= checkStage1(bandwidthDown, packetLossDown, downResults);
+	ok &= Calculation_checkStage1(bandwidthDown, packetLossDown, downResults);
 
 	return ok;
 }
 
-bool Q4SCommonProtocol::checkContinuity(unsigned long maxLatency, unsigned long maxJitter, float maxPacketLoss, Q4SMeasurementResult &results) const
+bool Calculation_checkContinuity(unsigned long maxLatency, unsigned long maxJitter, float maxPacketLoss, Q4SMeasurementResult &results)
 {
     bool ok = true;
 
@@ -291,21 +254,21 @@ bool Q4SCommonProtocol::checkContinuity(unsigned long maxLatency, unsigned long 
     return ok;
 }
 
-bool Q4SCommonProtocol::checkContinuity(
+bool Calculation_checkContinuity(
 	unsigned long maxLatencyUp, unsigned long maxJitterUp, float maxPacketLossUp, 
 	unsigned long maxLatencyDown, unsigned long maxJitterDown, float maxPacketLossDown, 
-	Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults) const
+	Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults)
 {
 	bool ok = true;
 
-	ok &= checkContinuity(maxLatencyUp, maxJitterUp, maxPacketLossUp, upResults);
+	ok &= Calculation_checkContinuity(maxLatencyUp, maxJitterUp, maxPacketLossUp, upResults);
 
-	ok &= checkContinuity(maxLatencyDown, maxJitterDown, maxPacketLossDown, downResults);
+	ok &= Calculation_checkContinuity(maxLatencyDown, maxJitterDown, maxPacketLossDown, downResults);
 
 	return ok;
 }
 
-void Q4SCommonProtocol::showCheckMessage(Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults) const
+void Calculation_showCheckMessage(Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults)
 {
 	if (downResults.latencyAlert)
 	{
@@ -348,7 +311,7 @@ void Q4SCommonProtocol::showCheckMessage(Q4SMeasurementResult &upResults, Q4SMea
 	}
 }
 
-std::string Q4SCommonProtocol::generateAlertMessage(Q4SSDPParams params, Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults) const
+std::string Calculation_generateAlertMessage(Q4SSDPParams params, Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults)
 {
 	//Alert
 	std::string alertMessage = "";
@@ -386,7 +349,7 @@ std::string Q4SCommonProtocol::generateAlertMessage(Q4SSDPParams params, Q4SMeas
 	return alertMessage;
 }
 
-std::string Q4SCommonProtocol::generateNotificationAlertMessage(Q4SSDPParams params, Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults) const
+std::string Calculation_generateNotificationAlertMessage(Q4SSDPParams params, Q4SMeasurementResult &upResults, Q4SMeasurementResult &downResults)
 {
 	//Alert
 	std::string alertMessage = "";
@@ -431,4 +394,46 @@ std::string Q4SCommonProtocol::generateNotificationAlertMessage(Q4SSDPParams par
 	alertMessage += "PacketLoss: " + packetLossString;
 
 	return alertMessage;
+}
+
+void Calculation_calculateLatency(
+	Q4SMessageManager &mReceivedMessages, 
+	std::vector<unsigned long> &arrSentPingTimestamps, 
+	float &latency, 
+	unsigned long pingsSent, 
+	bool showMeasureInfo)
+{
+    Q4SMessageInfo messageInfo;
+    std::vector<float> arrPingLatencies;
+    float actualPingLatency;
+    int pingIndex = 0;
+    int pingMaxCount = pingsSent;
+
+    // Prepare for Latency calculation
+    for( pingIndex = 0; pingIndex < pingMaxCount; pingIndex++ )
+    {
+        if( mReceivedMessages.read200OKMessage( messageInfo, true ) == true )
+        {
+            // Actual ping latency calculation
+            actualPingLatency = (messageInfo.timeStamp - arrSentPingTimestamps[ pingIndex ])/ 2.0f;
+
+            // Latency store
+            arrPingLatencies.push_back( actualPingLatency );
+
+            if (showMeasureInfo)
+            {
+                printf( "PING %d actual ping latency: %.3f\n", pingIndex, actualPingLatency );
+            }
+        }
+        else
+        {
+			if (showMeasureInfo)
+			{
+                printf( "PING RESPONSE %d message lost\n", pingIndex);
+			}
+        }
+    }
+
+    // Latency calculation
+    latency = EMathUtils_median( arrPingLatencies );
 }
